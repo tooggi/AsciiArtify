@@ -1,0 +1,21 @@
+apiVersion: batch/v1                                                          
+kind: Job                                                                     
+metadata:                                                                     
+  name: app-job-rsync                                                         
+spec:                                                                         
+  template:                                                                   
+    spec:                                                                     
+      restartPolicy: Never                                                    
+      containers:                                                             
+      - name: rsync-container                                                 
+        image: google/cloud-sdk:latest # You might want to use a specific version, e.g., google/cloud-sdk:400.0.0                                         
+        command: ["/bin/bash", "-c"]                                          
+        args: ["gsutil -m rsync -r gs://glow-sportradar /data/input"]         
+        volumeMounts:                                                         
+        - name: glow-data-disk                                                
+          mountPath: /data/input                                              
+      volumes:                                                                
+      - name: glow-data-disk                                                  
+        gcePersistentDisk:                                                    
+          pdName: glow-data-disk-200                                          
+          fsType: ext4 # Common filesystem for GCE Persistent Disks 
